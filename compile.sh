@@ -1,0 +1,1 @@
+g++ main.cpp -o INK-Engine -lglut -lGLU -lGL
