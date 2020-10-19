@@ -20,7 +20,7 @@ void timer(int);
 void reshape(int, int);
 void keyboardListener(unsigned char key, int x, int y);
 
-int scale = 1000;
+int scale = 10000;  //resolution of the sim
 int boundX = 1*scale;
 int boundY = 1*scale;
 
@@ -109,7 +109,7 @@ void display()
 
     //render objects
 
-    square(myPlayer.xpos,myPlayer.ypos,myPlayer.mass); //rendering the player , player one
+    square(myPlayer.xpos,myPlayer.ypos,myPlayer.mass*(scale/1000)); //rendering the player , player one
 
     glutSwapBuffers();
 }
@@ -121,7 +121,7 @@ void keyboardListener(unsigned char key, int x, int y)
 		case 'w': //jump
             if(myPlayer.ypos == 0)
             {
-                myPlayer.Vvelocity += 10.2;
+                myPlayer.Vvelocity += 10.2*(scale/1000);
             }
 			    
 			break;
@@ -129,21 +129,21 @@ void keyboardListener(unsigned char key, int x, int y)
 		case 's': 
 			if(myPlayer.ypos >= 0)
             {
-                myPlayer.Vvelocity -= 0.2;
+                myPlayer.Vvelocity -= 0.2*(scale/1000);
             }   
 		break;
         
         case 'a':
-            if(myPlayer.xpos >= 0)
+            if(myPlayer.xpos >= 0 && myPlayer.ypos == 0)
             {
-                myPlayer.Hvelocity -= 0.25;
+                myPlayer.Hvelocity -= 0.25*(scale/1000);
             } 
         break;
         
         case 'd':
-            if(myPlayer.xpos < boundX-myPlayer.mass)
+            if(myPlayer.xpos < boundX-myPlayer.mass && myPlayer.ypos == 0)
             {
-                myPlayer.Hvelocity += 0.25;
+                myPlayer.Hvelocity += 0.25*(scale/1000);
             } 
         break;
 
@@ -175,7 +175,7 @@ void timer(int)
     //player physics
     if(myPlayer.ypos > 0)
     {
-        myPlayer.Vvelocity += myWorld.gravity/100;  //gravity
+        myPlayer.Vvelocity += myWorld.gravity/100*(scale/1000);  //gravity
     }
 
     std::cout << myPlayer.Hvelocity << std::endl;
@@ -184,6 +184,15 @@ void timer(int)
     //acceleration.
     myPlayer.ypos += myPlayer.Vvelocity;
     myPlayer.xpos += myPlayer.Hvelocity;
+
+    if(myPlayer.ypos == 0 && myPlayer.Hvelocity > 0)
+    {
+        myPlayer.Hvelocity += myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+    }
+    else if(myPlayer.ypos == 0 && myPlayer.Hvelocity < 0)
+    {
+        myPlayer.Hvelocity -= myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+    }
 
     //boundary definition
     if(myPlayer.ypos < 0)
