@@ -118,10 +118,10 @@ void display()
 void keyboardListener(unsigned char key, int x, int y)
 {   
     switch (key){
-		case 'w':
-            if(myPlayer.ypos < boundY-myPlayer.mass)
+		case 'w': //jump
+            if(myPlayer.ypos == 0)
             {
-                myPlayer.Vvelocity += 0.2;
+                myPlayer.Vvelocity += 10.2;
             }
 			    
 			break;
