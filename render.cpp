@@ -7,10 +7,15 @@
 #include "player.h"
 #include "world.h"
 #include "render.h"
+#include "objects.h"
 
 typedef std::string string;
 
 using namespace InkEngine;
+
+
+
+
 
 player myPlayer;
 world myWorld;
@@ -164,11 +169,8 @@ float playerSpeed()
     
 }
 
-void timer(int)
-{   
-
-    
-
+void playerTick()
+{
     //player physics
     if(myPlayer.ypos > 0)
     {
@@ -209,6 +211,17 @@ void timer(int)
         myPlayer.xpos = 0;
         myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
     }
+}
+
+
+void timer(int)
+{   
+
+    playerTick();
+    
+    
+
+
 
     glutPostRedisplay();
     glutTimerFunc(1000/60, timer, 0);
