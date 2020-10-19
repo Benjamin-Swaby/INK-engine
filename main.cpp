@@ -201,9 +201,9 @@ void timer(int)
         myPlayer.Vvelocity = 0;
     }
 
-    if(myPlayer.xpos > boundX-myPlayer.mass)
+    if(myPlayer.xpos > boundX-myPlayer.mass*(scale/1000))
     {
-        myPlayer.xpos = boundY-myPlayer.mass;
+        myPlayer.xpos = boundY-myPlayer.mass*(scale/1000);
         myPlayer.Hvelocity = 0;
     }
 
