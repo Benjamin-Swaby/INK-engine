@@ -1,13 +1,16 @@
-#include "objects.h"
 #pragma once
+#include "objects.h"
 namespace InkEngine
 {
     class render
     {
         public:
-            objects * worldOBJ;
-            int start(int argc, char** argv);
             
+            objects * worldOBJ;
+            //methods
+            int start(int argc, char** argv);
+
+
 
             //constructor
             render(objects * objs)
@@ -15,5 +18,10 @@ namespace InkEngine
                 worldOBJ = objs;
             }
 
+            
+
+
     };
 }
+
+

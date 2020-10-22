@@ -3,33 +3,33 @@
 #include <GL/gl.h>
 #include <string>
 #include <iostream>
+#include <ctime>
+
 
 #include "player.h"
 #include "world.h"
 #include "render.h"
 #include "objects.h"
 
+
 typedef std::string string;
 
 using namespace InkEngine;
 
 
-
-
-
 player myPlayer;
 world myWorld;
-
+objects worldOB[64]; //maximum 64 entities
 
 void display();
 void timer(int);
 void reshape(int, int);
 void keyboardListener(unsigned char key, int x, int y);
 
-int scale = 10000;  //resolution of the sim
-int boundX = 1*scale;
-int boundY = 1*scale;
-
+const int scale = 10000;  //resolution of the sim
+const int boundX = 1*scale;
+const int boundY = 1*scale;
+std::time_t t = std::time(0);
 
 float gravityACC = 9.81;
 
@@ -58,12 +58,20 @@ int render::start(int argc, char** argv)
     glutInitWindowPosition(100, 100);
 
     glutCreateWindow("INK ENGINE");
+     //internal referance to the class.
+    
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutTimerFunc(0,timer,0);
     glutKeyboardFunc(keyboardListener);
     
+    //load objects into the local variable
+    for(int i = 0; i < sizeof(worldOBJ); i++)
+    {
+        worldOB[i] = worldOBJ[i];
+    }
+
 
     init();
     glutMainLoop();
@@ -106,16 +114,26 @@ void square(int x, int y, int size)
 }
 
 
+
+void renderObjs(objects * worldOBJ)
+{
+    for(int i = 0; i < sizeof(worldOBJ); i++)
+    {
+
+    }
+}
+
+
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
     square(myPlayer.xpos,myPlayer.ypos,myPlayer.mass*(scale/1000)); //rendering the player , player one
+    renderObjs(worldOB);
 
     glutSwapBuffers();
 }
-
 
 void keyboardListener(unsigned char key, int x, int y)
 {   
@@ -176,14 +194,13 @@ void playerTick()
     {
         myPlayer.Vvelocity += myWorld.gravity/100*(scale/1000);  //gravity
     }
-
-    std::cout << myPlayer.Hvelocity << std::endl;
     
    
     //acceleration.
     myPlayer.ypos += myPlayer.Vvelocity;
     myPlayer.xpos += myPlayer.Hvelocity;
 
+    //friction
     if(myPlayer.ypos == 0 && myPlayer.Hvelocity > 0)
     {
         myPlayer.Hvelocity += myWorld.floorFriction/60*playerSpeed()*(scale/10000);
@@ -192,6 +209,7 @@ void playerTick()
     {
         myPlayer.Hvelocity -= myWorld.floorFriction/60*playerSpeed()*(scale/10000);
     }
+
 
     //boundary definition
     if(myPlayer.ypos < 0)
@@ -211,6 +229,8 @@ void playerTick()
         myPlayer.xpos = 0;
         myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
     }
+
+
 }
 
 
