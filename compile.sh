@@ -1,1 +1,1 @@
-g++ *.cpp -o INK-Engine -lglut -lGLU -lGL
+g++ *.cpp -o INK-Engine -lglut -lGLU -lGL -pthread

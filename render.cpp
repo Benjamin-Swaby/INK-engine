@@ -3,8 +3,8 @@
 #include <GL/gl.h>
 #include <string>
 #include <iostream>
-#include <ctime>
-
+#include <chrono>
+#include <thread>
 
 #include "player.h"
 #include "world.h"
@@ -12,6 +12,7 @@
 #include "objects.h"
 
 
+typedef std::thread thread;
 typedef std::string string;
 
 using namespace InkEngine;
@@ -25,11 +26,12 @@ void display();
 void timer(int);
 void reshape(int, int);
 void keyboardListener(unsigned char key, int x, int y);
+void playerTick();
 
 const int scale = 10000;  //resolution of the sim
 const int boundX = 1*scale;
 const int boundY = 1*scale;
-std::time_t t = std::time(0);
+
 
 float gravityACC = 9.81;
 
@@ -59,13 +61,15 @@ int render::start(int argc, char** argv)
 
     glutCreateWindow("INK ENGINE");
      //internal referance to the class.
-    
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutTimerFunc(0,timer,0);
     glutKeyboardFunc(keyboardListener);
-    
+
+    //make a new thead to handle all the player phyisics independant of time
+    thread t2(playerTick);
+
     //load objects into the local variable
     for(int i = 0; i < sizeof(worldOBJ); i++)
     {
@@ -188,47 +192,54 @@ float playerSpeed()
 }
 
 void playerTick()
-{
-    //player physics
-    if(myPlayer.ypos > 0)
+{   
+
+    while(true)
     {
-        myPlayer.Vvelocity += myWorld.gravity/100*(scale/1000);  //gravity
-    }
+
+        std::this_thread::sleep_for (std::chrono::milliseconds(16));
+           //player physics
+        if(myPlayer.ypos > 0)
+        {
+            myPlayer.Vvelocity += myWorld.gravity/100*(scale/1000);  //gravity
+        }
+        
     
-   
-    //acceleration.
-    myPlayer.ypos += myPlayer.Vvelocity;
-    myPlayer.xpos += myPlayer.Hvelocity;
+        //acceleration.
+        myPlayer.ypos += myPlayer.Vvelocity;
+        myPlayer.xpos += myPlayer.Hvelocity;
 
-    //friction
-    if(myPlayer.ypos == 0 && myPlayer.Hvelocity > 0)
-    {
-        myPlayer.Hvelocity += myWorld.floorFriction/60*playerSpeed()*(scale/10000);
-    }
-    else if(myPlayer.ypos == 0 && myPlayer.Hvelocity < 0)
-    {
-        myPlayer.Hvelocity -= myWorld.floorFriction/60*playerSpeed()*(scale/10000);
-    }
+        //friction
+        if(myPlayer.ypos == 0 && myPlayer.Hvelocity > 0)
+        {
+            myPlayer.Hvelocity += myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+        }
+        else if(myPlayer.ypos == 0 && myPlayer.Hvelocity < 0)
+        {
+            myPlayer.Hvelocity -= myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+        }
 
 
-    //boundary definition
-    if(myPlayer.ypos < 0)
-    {
-        myPlayer.ypos = 0;
-        myPlayer.Vvelocity = 0;
-    }
+        //boundary definition
+        if(myPlayer.ypos < 0)
+        {
+            myPlayer.ypos = 0;
+            myPlayer.Vvelocity = 0;
+        }
 
-    if(myPlayer.xpos > boundX-myPlayer.mass*(scale/1000))
-    {
-        myPlayer.xpos = boundX-myPlayer.mass*(scale/1000);
-        myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
-    }
+        if(myPlayer.xpos > boundX-myPlayer.mass*(scale/1000))
+        {
+            myPlayer.xpos = boundX-myPlayer.mass*(scale/1000);
+            myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
+        }
 
-    if(myPlayer.xpos < 0)
-    {
-        myPlayer.xpos = 0;
-        myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
+        if(myPlayer.xpos < 0)
+        {
+            myPlayer.xpos = 0;
+            myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
+        }
     }
+ 
 
 
 }
@@ -236,12 +247,8 @@ void playerTick()
 
 void timer(int)
 {   
-
-    playerTick();
     
-    
-
-
+    std::cout << myPlayer.xpos << "  " << myPlayer.ypos << std::endl;
 
     glutPostRedisplay();
     glutTimerFunc(1000/60, timer, 0);
