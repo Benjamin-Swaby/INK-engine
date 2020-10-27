@@ -10,6 +10,7 @@ namespace InkEngine
             float Vvelocity;
             float Hvelocity;
             int mass;
+            bool dynamic;
             
             //default constructor
             objects()
@@ -18,13 +19,15 @@ namespace InkEngine
             }
 
             //constructor
-            objects(float xpos, float ypos, int mass, float Vvelocity = 0, float Hvelocity = 0)
+            objects(float xpos, float ypos, int mass,bool dynamic = false, float Vvelocity = 0, float Hvelocity = 0)
             {
                 this->xpos = xpos;
                 this->ypos = ypos;
                 this->mass = mass;
                 this->Vvelocity = Vvelocity;
                 this->Hvelocity = Hvelocity;
+                this -> dynamic = dynamic;
+
             }
         
     };

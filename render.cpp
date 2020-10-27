@@ -20,13 +20,15 @@ using namespace InkEngine;
 
 player myPlayer;
 world myWorld;
+int objCount;
 objects worldOB[64]; //maximum 64 entities
+
 
 void display();
 void timer(int);
 void reshape(int, int);
 void keyboardListener(unsigned char key, int x, int y);
-void playerTick();
+void Tick();
 
 const int scale = 10000;  //resolution of the sim
 const int boundX = 1*scale;
@@ -67,15 +69,17 @@ int render::start(int argc, char** argv)
     glutTimerFunc(0,timer,0);
     glutKeyboardFunc(keyboardListener);
 
-    //make a new thead to handle all the player phyisics independant of time
-    thread t2(playerTick);
+    //set the length of the object array
+    objCount = length;
 
     //load objects into the local variable
-    for(int i = 0; i < sizeof(worldOBJ); i++)
+    for(int i = 0; i < objCount; i++)
     {
         worldOB[i] = worldOBJ[i];
     }
 
+    //make a new thead to handle all the player phyisics independant of time
+    thread t2(Tick);
 
     init();
     glutMainLoop();
@@ -119,11 +123,18 @@ void square(int x, int y, int size)
 
 
 
-void renderObjs(objects * worldOBJ)
-{
-    for(int i = 0; i < sizeof(worldOBJ); i++)
-    {
+void renderObjs(objects * worldOBJ, int length)
+{   
 
+    for(int i = 0; i < length; i++)
+    {   
+        
+        float xpos = worldOBJ[i].xpos;
+        float ypos = worldOBJ[i].ypos;
+        float mass = worldOBJ[i].mass;
+        std::cout << "on render" << ypos << std::endl;
+        square(xpos,ypos,mass*(scale/1000));
+       
     }
 }
 
@@ -134,7 +145,7 @@ void display()
     glLoadIdentity();
 
     square(myPlayer.xpos,myPlayer.ypos,myPlayer.mass*(scale/1000)); //rendering the player , player one
-    renderObjs(worldOB);
+    renderObjs(worldOB, objCount);
 
     glutSwapBuffers();
 }
@@ -191,12 +202,13 @@ float playerSpeed()
     
 }
 
-void playerTick()
+
+void Tick()
 {   
 
     while(true)
     {
-
+        //player physics
         std::this_thread::sleep_for (std::chrono::milliseconds(16));
            //player physics
         if(myPlayer.ypos > 0)
@@ -238,6 +250,46 @@ void playerTick()
             myPlayer.xpos = 0;
             myPlayer.Hvelocity = -myPlayer.Hvelocity+0.5*(myPlayer.Hvelocity);
         }
+
+
+        //object physics
+        for(int i = 0; i < objCount; i++)
+        {
+            objects target = worldOB[i];  //is the target of the physics
+            
+            
+            //if the target is dynamic 
+            if(target.dynamic)
+            {   
+                
+            
+                if(target.ypos > 0)
+                {
+                    target.Vvelocity += myWorld.gravity/100*(scale);
+                    //std::cout << target.Vvelocity << std::endl;
+                }
+                
+                //friction
+                if(target.ypos == 0 && target.Hvelocity > 0)
+                {       
+                    target.Hvelocity += myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+                }
+                else if(target.ypos == 0 && target.Hvelocity < 0)
+                {
+                    target.Hvelocity -= myWorld.floorFriction/60*playerSpeed()*(scale/10000);
+                }   
+
+                //velocity based movement
+                std::cout << target.ypos << " - > ";
+                target.ypos += target.Vvelocity;
+                target.xpos += target.Hvelocity;
+                std::cout << target.ypos << std::endl;
+
+                
+            }
+          
+        }
+
     }
  
 
@@ -248,7 +300,7 @@ void playerTick()
 void timer(int)
 {   
     
-    std::cout << myPlayer.xpos << "  " << myPlayer.ypos << std::endl;
+    
 
     glutPostRedisplay();
     glutTimerFunc(1000/60, timer, 0);

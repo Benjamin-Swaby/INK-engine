@@ -8,10 +8,10 @@ int main(int argc, char** argv)
 {
 
     objects myobjs[2];
-    myobjs[0] = objects(100.0,100.0,100);
-    myobjs[1] = objects(100.0,100.0,100);
+    myobjs[0] = objects(1000.0,100.0,15);
+    myobjs[1] = objects(200.0,200.0,15,true);
 
-    render renderer(myobjs);
+    render renderer(myobjs,2);
 
 
     renderer.start(argc, argv);
