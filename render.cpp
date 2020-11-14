@@ -332,11 +332,32 @@ void Tick()
                     worldOB[i].Hvelocity = -worldOB[i].Hvelocity+0.5*(worldOB[i].Hvelocity);
                 }
             }
+            if(worldOB[i].xpos < 0)
+            {
+                worldOB[i].xpos = 0;
+
+                if(myWorld.bounceWalls)
+                {
+                    worldOB[i].Hvelocity = -worldOB[i].Hvelocity+0.5*(worldOB[i].Hvelocity);
+                }
+            }
 
 
 
             worldOB[i].ypos += worldOB[1].Vvelocity;
    
+        }
+
+
+
+        //col
+        //iterate through objects and player and check for conflictions
+        
+        for(int i = 0; i++ i < 65)
+        {
+            //get list of stuff
+            
+             
         }
 
           
